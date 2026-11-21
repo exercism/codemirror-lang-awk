@@ -1,5 +1,5 @@
 import { EditorState } from '@codemirror/state';
-import { gawkLanguage, gawkLinter, GAWK_BUILTIN_FUNCTIONS, GAWK_DIRECTIVES } from '../src/index';
+import { awkLanguage, awkLinter, GAWK_BUILTIN_FUNCTIONS, GAWK_DIRECTIVES } from '../src/index';
 
 console.log('--- Testing GNU AWK CodeMirror 6 Plugin ---');
 
@@ -17,7 +17,7 @@ console.log('✅ Tokens & Built-ins verified!');
 console.log('2. Verifying EditorState initialization...');
 const state = EditorState.create({
   doc: '@include "test.awk"\nBEGIN { print "hello" }',
-  extensions: [gawkLanguage]
+  extensions: [awkLanguage]
 });
 
 console.assert(state.doc.toString().includes('BEGIN'), 'Doc should contain BEGIN');

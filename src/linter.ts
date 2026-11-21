@@ -5,7 +5,7 @@ import { GAWK_DIRECTIVES } from './tokens';
 /**
  * Diagnostic Linter for GNU AWK syntax checks
  */
-export function gawkLinter(): Extension {
+export function awkLinter(): Extension {
   return linter((view) => {
     const diagnostics: Diagnostic[] = [];
     const doc = view.state.doc;

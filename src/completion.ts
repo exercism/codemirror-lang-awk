@@ -164,7 +164,7 @@ function getDocumentSymbols(docText: string): Completion[] {
 /**
  * CodeMirror 6 Completion Source for GNU AWK
  */
-export function gawkCompletionSource(context: CompletionContext): CompletionResult | null {
+export function awkCompletionSource(context: CompletionContext): CompletionResult | null {
   // Check if completion is triggered right after @
   const word = context.matchBefore(/@[\w_]*|[A-Za-z_][A-Za-z0-9_]*/);
 
