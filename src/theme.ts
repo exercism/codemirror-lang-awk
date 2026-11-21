@@ -4,7 +4,7 @@ import { Extension } from '@codemirror/state';
 /**
  * Built-in Modern Dark Visual Theme for GNU AWK Editor
  */
-export const gawkDarkTheme = EditorView.theme(
+export const awkDarkTheme = EditorView.theme(
   {
     '&': {
       backgroundColor: '#0f172a',
@@ -42,20 +42,20 @@ export const gawkDarkTheme = EditorView.theme(
       padding: '0 4px'
     },
     // GNU AWK Syntax Highlighting Classes
-    '.cm-gawk-directive': { color: '#c084fc', fontWeight: 'bold' }, // @include, @namespace
-    '.cm-gawk-pattern': { color: '#f59e0b', fontWeight: 'bold' }, // BEGIN, END
-    '.cm-gawk-keyword': { color: '#f43f5e', fontWeight: 'bold' }, // if, else, for, while
-    '.cm-gawk-builtin-var': { color: '#38bdf8', fontWeight: '600' }, // FS, NF, NR, ARGIND
-    '.cm-gawk-field': { color: '#4ade80', fontWeight: 'bold' }, // $0, $1, $NF
-    '.cm-gawk-builtin-func': { color: '#60a5fa' }, // gensub, patsplit, strftime
-    '.cm-gawk-func-def': { color: '#a78bfa', fontWeight: 'bold' },
-    '.cm-gawk-func-call': { color: '#38bdf8' },
-    '.cm-gawk-string': { color: '#a3e635' },
-    '.cm-gawk-regex': { color: '#fb923c' },
-    '.cm-gawk-number': { color: '#facc15' },
-    '.cm-gawk-comment': { color: '#64748b', fontStyle: 'italic' },
-    '.cm-gawk-operator': { color: '#cbd5e1' },
-    '.cm-gawk-punctuation': { color: '#94a3b8' }
+    '.cm-awk-directive': { color: '#c084fc', fontWeight: 'bold' }, // @include, @namespace
+    '.cm-awk-pattern': { color: '#f59e0b', fontWeight: 'bold' }, // BEGIN, END
+    '.cm-awk-keyword': { color: '#f43f5e', fontWeight: 'bold' }, // if, else, for, while
+    '.cm-awk-builtin-var': { color: '#38bdf8', fontWeight: '600' }, // FS, NF, NR, ARGIND
+    '.cm-awk-field': { color: '#4ade80', fontWeight: 'bold' }, // $0, $1, $NF
+    '.cm-awk-builtin-func': { color: '#60a5fa' }, // gensub, patsplit, strftime
+    '.cm-awk-func-def': { color: '#a78bfa', fontWeight: 'bold' },
+    '.cm-awk-func-call': { color: '#38bdf8' },
+    '.cm-awk-string': { color: '#a3e635' },
+    '.cm-awk-regex': { color: '#fb923c' },
+    '.cm-awk-number': { color: '#facc15' },
+    '.cm-awk-comment': { color: '#64748b', fontStyle: 'italic' },
+    '.cm-awk-operator': { color: '#cbd5e1' },
+    '.cm-awk-punctuation': { color: '#94a3b8' }
   },
   { dark: true }
 );
@@ -63,7 +63,7 @@ export const gawkDarkTheme = EditorView.theme(
 /**
  * Built-in Modern Light Visual Theme for GNU AWK Editor
  */
-export const gawkLightTheme = EditorView.theme(
+export const awkLightTheme = EditorView.theme(
   {
     '&': {
       backgroundColor: '#ffffff',
@@ -89,20 +89,20 @@ export const gawkLightTheme = EditorView.theme(
     },
 
     // Light mode syntax highlighting
-    '.cm-gawk-directive': { color: '#7e22ce', fontWeight: 'bold' },
-    '.cm-gawk-pattern': { color: '#d97706', fontWeight: 'bold' },
-    '.cm-gawk-keyword': { color: '#be123c', fontWeight: 'bold' },
-    '.cm-gawk-builtin-var': { color: '#0369a1', fontWeight: '600' },
-    '.cm-gawk-field': { color: '#15803d', fontWeight: 'bold' },
-    '.cm-gawk-builtin-func': { color: '#1d4ed8' },
-    '.cm-gawk-func-def': { color: '#6d28d9', fontWeight: 'bold' },
-    '.cm-gawk-func-call': { color: '#0284c7' },
-    '.cm-gawk-string': { color: '#4d7c0f' },
-    '.cm-gawk-regex': { color: '#c2410c' },
-    '.cm-gawk-number': { color: '#b45309' },
-    '.cm-gawk-comment': { color: '#64748b', fontStyle: 'italic' },
-    '.cm-gawk-operator': { color: '#334155' },
-    '.cm-gawk-punctuation': { color: '#475569' }
+    '.cm-awk-directive': { color: '#7e22ce', fontWeight: 'bold' },
+    '.cm-awk-pattern': { color: '#d97706', fontWeight: 'bold' },
+    '.cm-awk-keyword': { color: '#be123c', fontWeight: 'bold' },
+    '.cm-awk-builtin-var': { color: '#0369a1', fontWeight: '600' },
+    '.cm-awk-field': { color: '#15803d', fontWeight: 'bold' },
+    '.cm-awk-builtin-func': { color: '#1d4ed8' },
+    '.cm-awk-func-def': { color: '#6d28d9', fontWeight: 'bold' },
+    '.cm-awk-func-call': { color: '#0284c7' },
+    '.cm-awk-string': { color: '#4d7c0f' },
+    '.cm-awk-regex': { color: '#c2410c' },
+    '.cm-awk-number': { color: '#b45309' },
+    '.cm-awk-comment': { color: '#64748b', fontStyle: 'italic' },
+    '.cm-awk-operator': { color: '#334155' },
+    '.cm-awk-punctuation': { color: '#475569' }
   },
   { dark: false }
 );

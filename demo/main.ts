@@ -1,7 +1,7 @@
 import { EditorView, ViewUpdate } from '@codemirror/view';
 import { basicSetup } from 'codemirror';
 import { Compartment } from '@codemirror/state';
-import { gawk, gawkDarkTheme, gawkLightTheme, gawkStreamParser } from '../src/index';
+import { awk, awkDarkTheme, awkLightTheme, awkStreamParser } from '../src/index';
 
 // Presets
 const SAMPLES = {
@@ -151,8 +151,8 @@ const view = new EditorView({
   doc: SAMPLES.logParser,
   extensions: [
     basicSetup,
-    gawk({ lint: true, autocomplete: true }),
-    themeCompartment.of(gawkDarkTheme),
+    awk({ lint: true, autocomplete: true }),
+    themeCompartment.of(awkDarkTheme),
     EditorView.updateListener.of((update: ViewUpdate) => {
       if (update.docChanged) {
         updateTokenInspector();
@@ -173,7 +173,7 @@ function updateTokenInspector() {
 
   // Stream tokenize lines
   const lines = code.split('\n');
-  const state = gawkStreamParser.startState!(0);
+  const state = awkStreamParser.startState!(0);
 
   for (const line of lines) {
     const stream = {
@@ -236,7 +236,7 @@ function updateTokenInspector() {
     let startPos = 0;
     while (!stream.eol()) {
       startPos = stream.pos;
-      const type = gawkStreamParser.token(stream as any, state);
+      const type = awkStreamParser.token(stream as any, state);
       const text = stream.current();
       if (type && text.trim()) {
         tokens.push({ text: text.trim(), type });
@@ -280,7 +280,7 @@ themeBtn.addEventListener('click', () => {
   document.body.className = isDarkTheme ? 'dark-theme' : 'light-theme';
   themeBtn.innerHTML = isDarkTheme ? '<span class="theme-icon">☀️</span> Light Mode' : '<span class="theme-icon">🌙</span> Dark Mode';
   view.dispatch({
-    effects: themeCompartment.reconfigure(isDarkTheme ? gawkDarkTheme : gawkLightTheme)
+    effects: themeCompartment.reconfigure(isDarkTheme ? awkDarkTheme : awkLightTheme)
   });
 });
 

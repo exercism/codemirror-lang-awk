@@ -1,11 +1,11 @@
 import { StreamLanguage, LanguageSupport, syntaxHighlighting, HighlightStyle } from '@codemirror/language';
 import { autocompletion } from '@codemirror/autocomplete';
 import { Extension } from '@codemirror/state';
-import { gawkStreamParser } from './grammar';
-import { gawkHighlightStyle } from './highlight';
-import { gawkCompletionSource } from './completion';
-import { gawkLinter } from './linter';
-import { gawkDarkTheme, gawkLightTheme } from './theme';
+import { awkStreamParser } from './grammar';
+import { awkHighlightStyle } from './highlight';
+import { awkCompletionSource } from './completion';
+import { awkLinter } from './linter';
+import { awkDarkTheme, awkLightTheme } from './theme';
 
 export * from './tokens';
 export * from './grammar';
@@ -17,14 +17,14 @@ export * from './theme';
 /**
  * Highlighting Style extension for GNU AWK
  */
-export const gawkHighlighting = syntaxHighlighting(HighlightStyle.define(gawkHighlightStyle));
+export const awkHighlighting = syntaxHighlighting(HighlightStyle.define(awkHighlightStyle));
 
 /**
  * CodeMirror 6 StreamLanguage definition for GNU AWK
  */
-export const gawkLanguage = StreamLanguage.define(gawkStreamParser);
+export const awkLanguage = StreamLanguage.define(awkStreamParser);
 
-export interface GawkLanguageOptions {
+export interface AwkLanguageOptions {
   /**
    * Enable diagnostic linting for syntax errors. Default: true.
    */
@@ -36,7 +36,7 @@ export interface GawkLanguageOptions {
 }
 
 /**
- * Main CodeMirror 6 plugin extension function for GNU AWK (gawk).
+ * Main CodeMirror 6 plugin extension function for GNU AWK (awk).
  *
  * @param options Configuration options for linting and autocompletion
  * @returns LanguageSupport instance for CodeMirror 6
@@ -45,28 +45,28 @@ export interface GawkLanguageOptions {
  * ```ts
  * import { EditorView } from '@codemirror/view';
  * import { basicSetup } from 'codemirror';
- * import { gawk } from 'codemirror-lang-gawk';
+ * import { awk } from '@exercism/codemirror-lang-awk';
  *
  * new EditorView({
  *   doc: 'BEGIN { print "Hello, GNU AWK!" }',
- *   extensions: [basicSetup, gawk()]
+ *   extensions: [basicSetup, awk()]
  * });
  * ```
  */
-export function gawk(options: GawkLanguageOptions = {}): LanguageSupport {
-  const extensions: Extension[] = [gawkHighlighting];
+export function awk(options: AwkLanguageOptions = {}): LanguageSupport {
+  const extensions: Extension[] = [awkHighlighting];
 
   if (options.autocomplete !== false) {
     extensions.push(
       autocompletion({
-        override: [gawkCompletionSource]
+        override: [awkCompletionSource]
       })
     );
   }
 
   if (options.lint !== false) {
-    extensions.push(gawkLinter());
+    extensions.push(awkLinter());
   }
 
-  return new LanguageSupport(gawkLanguage, extensions);
+  return new LanguageSupport(awkLanguage, extensions);
 }

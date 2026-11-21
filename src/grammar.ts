@@ -8,7 +8,7 @@ import {
   GAWK_BUILTIN_FUNCTIONS
 } from './tokens';
 
-export interface GawkState {
+export interface AwkState {
   inString: boolean;
   stringQuote: string;
   inRegex: boolean;
@@ -18,8 +18,8 @@ export interface GawkState {
   lastToken: string;
 }
 
-export const gawkStreamParser: StreamParser<GawkState> = {
-  name: 'gawk',
+export const awkStreamParser: StreamParser<AwkState> = {
+  name: 'awk',
 
   tokenTable: {
     'special(keyword)': t.special(t.keyword),
@@ -30,7 +30,7 @@ export const gawkStreamParser: StreamParser<GawkState> = {
     'function(call)': t.function(t.variableName)
   },
 
-  startState(): GawkState {
+  startState(): AwkState {
     return {
       inString: false,
       stringQuote: '"',
@@ -42,7 +42,7 @@ export const gawkStreamParser: StreamParser<GawkState> = {
     };
   },
 
-  token(stream: StringStream, state: GawkState): string | null {
+  token(stream: StringStream, state: AwkState): string | null {
     // 1. Handle spaces
     if (stream.eatSpace()) {
       return null;
@@ -235,7 +235,7 @@ export const gawkStreamParser: StreamParser<GawkState> = {
     return null;
   },
 
-  indent(state: GawkState, textAfter: string): number {
+  indent(state: AwkState, textAfter: string): number {
     // Basic indentation logic
     if (textAfter.startsWith('}')) {
       return 0;

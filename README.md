@@ -1,6 +1,6 @@
 # CodeMirror 6 GNU AWK (gawk) Support
 
-`codemirror-lang-gawk` is a CodeMirror 6 language plugin providing full syntax highlighting, autocompletion, diagnostic linting, and custom themes for both standard **POSIX AWK** and **GNU AWK (gawk)**.
+`@exercism/codemirror-lang-awk` is a CodeMirror 6 language plugin providing full syntax highlighting, autocompletion, diagnostic linting, and custom themes for both standard **POSIX AWK** and **GNU AWK (gawk)**.
 
 ---
 
@@ -44,20 +44,20 @@
 
 ## ✨ CodeMirror 6 Features Implemented
 
-* **Stream Parser Engine (`gawkLanguage` / `gawkStreamParser`)**:
+* **Stream Parser Engine (`awkLanguage` / `awkStreamParser`)**:
   Custom tokenizer built for CodeMirror 6 supporting standard AWK and GNU AWK extensions (including directives, special pattern blocks, regex literals, field references, and hex/octal numbers).
 
-* **Syntax Highlighting & Bundled Themes (`gawkHighlighting`, `gawkDarkTheme`, `gawkLightTheme`)**:
+* **Syntax Highlighting & Bundled Themes (`awkHighlighting`, `awkDarkTheme`, `awkLightTheme`)**:
   Token tags mapped to `@lezer/highlight` with custom dark and light editor themes tailored for AWK development.
 
-* **Context-Aware Autocompletion (`gawkCompletionSource`)**:
+* **Context-Aware Autocompletion (`awkCompletionSource`)**:
   * **GNU Directives**: `@include`, `@load`, `@namespace`.
   * **Built-in Functions**: Comprehensive completion list with function signatures, types, and detailed documentation tooltips (e.g., `gensub`, `patsplit`, `strftime`, `typeof`, `asort`).
   * **Built-in Variables**: Standard and GNU-specific special variables (`FS`, `OFS`, `NR`, `NF`, `ARGIND`, `FPAT`, `ERRNO`, `SYMTAB`, etc.).
   * **Snippets**: Quick insertions for `BEGIN`, `END`, `function`, `for (in)`, `for (i=1..n)`, `@include`, `@namespace`, and `@load`.
   * **Document Symbol Scanner**: Dynamically collects user-defined function names and variable identifiers from the active document.
 
-* **Live Diagnostic Linter (`gawkLinter`)**:
+* **Live Diagnostic Linter (`awkLinter`)**:
   Real-time syntax checking highlighting code issues directly in the editor:
   * Unterminated string literals (`"text...`)
   * Unclosed regular expression literals (`/pattern...`)
@@ -112,7 +112,7 @@
 ```typescript
 import { EditorView } from '@codemirror/view';
 import { basicSetup } from 'codemirror';
-import { gawk, gawkDarkTheme } from 'codemirror-lang-gawk';
+import { awk, awkDarkTheme } from '@exercism/codemirror-lang-awk';
 
 const editor = new EditorView({
   doc: `@include "helpers.awk"
@@ -139,8 +139,8 @@ END {
 }`,
   extensions: [
     basicSetup,
-    gawk({ lint: true, autocomplete: true }),
-    gawkDarkTheme
+    awk({ lint: true, autocomplete: true }),
+    awkDarkTheme
   ],
   parent: document.getElementById('editor')!
 });
