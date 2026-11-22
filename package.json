@@ -16,16 +16,17 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
   },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && tsc -p tsconfig.build.json",
     "preview": "vite preview",
-    "test": "tsc --noEmit"
+    "test": "tsc --noEmit",
+    "test:runner": "esbuild test/test-runner.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/awk-test-runner.mjs && node node_modules/.cache/awk-test-runner.mjs"
   },
   "keywords": [
     "codemirror",
@@ -50,6 +51,7 @@
     "codemirror": "^6.0.1"
   },
   "devDependencies": {
+    "esbuild": "^0.28.2",
     "typescript": "^5.5.4",
     "vite": "^5.4.0"
   }

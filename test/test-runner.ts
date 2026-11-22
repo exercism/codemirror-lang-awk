@@ -11,21 +11,31 @@ import {
 
 console.log('--- Testing GNU AWK CodeMirror 6 Plugin ---');
 
+let failures = 0;
+
+// Like console.assert, but counted and reported so the process can exit non-zero.
+function assert(condition: unknown, message: string): void {
+  if (!condition) {
+    failures++;
+    console.error(`❌ Assertion failed: ${message}`);
+  }
+}
+
 // Test 1: Tokens verification
 console.log('1. Verifying Built-in Directives & Functions...');
-console.assert(GAWK_DIRECTIVES.has('@include'), 'Directives should contain @include');
-console.assert(GAWK_DIRECTIVES.has('@namespace'), 'Directives should contain @namespace');
-console.assert(GAWK_DIRECTIVES.has('@load'), 'Directives should contain @load');
-console.assert(GAWK_BUILTIN_FUNCTIONS['gensub'], 'Built-ins should contain gensub');
-console.assert(GAWK_BUILTIN_FUNCTIONS['patsplit'], 'Built-ins should contain patsplit');
-console.assert(GAWK_BUILTIN_FUNCTIONS['strftime'], 'Built-ins should contain strftime');
+assert(GAWK_DIRECTIVES.has('@include'), 'Directives should contain @include');
+assert(GAWK_DIRECTIVES.has('@namespace'), 'Directives should contain @namespace');
+assert(GAWK_DIRECTIVES.has('@load'), 'Directives should contain @load');
+assert(GAWK_BUILTIN_FUNCTIONS['gensub'], 'Built-ins should contain gensub');
+assert(GAWK_BUILTIN_FUNCTIONS['patsplit'], 'Built-ins should contain patsplit');
+assert(GAWK_BUILTIN_FUNCTIONS['strftime'], 'Built-ins should contain strftime');
 console.log('✅ Tokens & Built-ins verified!');
 
 // Test 1b: Statements tokenize as keywords, not variables
 console.log('1b. Verifying print/printf/getline tokenize as keywords...');
-console.assert(GAWK_KEYWORDS.has('print'), 'Keywords should contain print');
-console.assert(GAWK_KEYWORDS.has('printf'), 'Keywords should contain printf');
-console.assert(GAWK_KEYWORDS.has('getline'), 'Keywords should contain getline');
+assert(GAWK_KEYWORDS.has('print'), 'Keywords should contain print');
+assert(GAWK_KEYWORDS.has('printf'), 'Keywords should contain printf');
+assert(GAWK_KEYWORDS.has('getline'), 'Keywords should contain getline');
 
 function firstToken(code: string): string | null {
   const state = awkStreamParser.startState();
@@ -33,10 +43,10 @@ function firstToken(code: string): string | null {
   return awkStreamParser.token(stream, state);
 }
 
-console.assert(firstToken('print "hello"') === 'keyword', "'print' should tokenize as keyword");
-console.assert(firstToken('printf "%d\\n", n') === 'keyword', "'printf' should tokenize as keyword");
-console.assert(firstToken('getline line < file') === 'keyword', "'getline' should tokenize as keyword");
-console.assert(firstToken('printout = 1') === 'variableName', "'printout' should still be a variable");
+assert(firstToken('print "hello"') === 'keyword', "'print' should tokenize as keyword");
+assert(firstToken('printf "%d\\n", n') === 'keyword', "'printf' should tokenize as keyword");
+assert(firstToken('getline line < file') === 'keyword', "'getline' should tokenize as keyword");
+assert(firstToken('printout = 1') === 'variableName', "'printout' should still be a variable");
 console.log('✅ Statements tokenize as keywords!');
 
 // Test 1c: All keywords from the gawk manual are recognized
@@ -47,15 +57,15 @@ const GAWK_MANUAL_KEYWORDS = [
   'switch', 'while'
 ];
 for (const kw of GAWK_MANUAL_KEYWORDS) {
-  console.assert(GAWK_KEYWORDS.has(kw), `Keywords should contain ${kw}`);
+  assert(GAWK_KEYWORDS.has(kw), `Keywords should contain ${kw}`);
 }
 for (const pattern of ['BEGIN', 'BEGINFILE', 'END', 'ENDFILE']) {
-  console.assert(
+  assert(
     firstToken(pattern + ' { print }') === 'special(keyword)',
     `'${pattern}' should tokenize as special(keyword)`
   );
 }
-console.assert(
+assert(
   firstToken('switch (x) { case 1: print x; default: print "?" }') === 'keyword',
   "'switch' should tokenize as keyword"
 );
@@ -68,7 +78,7 @@ const state = EditorState.create({
   extensions: [awkLanguage]
 });
 
-console.assert(state.doc.toString().includes('BEGIN'), 'Doc should contain BEGIN');
+assert(state.doc.toString().includes('BEGIN'), 'Doc should contain BEGIN');
 console.log('✅ EditorState initialized successfully!');
 
 // Test 3: Function parameters tokenize as variables, not function definitions
@@ -94,18 +104,22 @@ const funcTokens = tokenizeLines([
   'function nextPrime(prime,    candidate) {',
   '    candidate = prime + 2'
 ]);
-console.assert(
+assert(
   funcTokens.get('nextPrime') === 'function(definition)',
   "'nextPrime' should tokenize as function(definition)"
 );
-console.assert(
+assert(
   funcTokens.get('prime') === 'variableName',
   "parameter 'prime' should tokenize as variableName"
 );
-console.assert(
+assert(
   funcTokens.get('candidate') === 'variableName',
   "parameter 'candidate' should tokenize as variableName"
 );
 console.log('✅ Function parameters tokenize as variables!');
 
+if (failures > 0) {
+  console.error(`--- ${failures} Check(s) FAILED! ---`);
+  process.exit(1);
+}
 console.log('--- All Plugin Checks Passed! ---');
