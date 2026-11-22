@@ -4,6 +4,7 @@ import {
   awkLanguage,
   awkLinter,
   awkStreamParser,
+  findCommentStart,
   GAWK_BUILTIN_FUNCTIONS,
   GAWK_DIRECTIVES,
   GAWK_KEYWORDS
@@ -117,6 +118,76 @@ assert(
   "parameter 'candidate' should tokenize as variableName"
 );
 console.log('✅ Function parameters tokenize as variables!');
+
+// Test 4: A string literal tokenizes as a single token (not quote + rest)
+console.log('4. Verifying string literals are single tokens...');
+const includeTokens: { text: string; style: string | null }[] = [];
+{
+  const parserState = awkStreamParser.startState();
+  const stream = new StringStream('@include "log_utils.awk"', 4, 4);
+  while (!stream.eol()) {
+    const pos = stream.pos;
+    const style = awkStreamParser.token(stream, parserState);
+    if (stream.pos === pos) stream.next(); // safety: always advance
+    if (style) includeTokens.push({ text: stream.current(), style });
+    stream.start = stream.pos; // normally done by the editor between tokens
+  }
+}
+assert(includeTokens.length === 2, '@include line should produce exactly 2 tokens');
+assert(
+  includeTokens[0]?.text === '@include' && includeTokens[0]?.style === 'processingInstruction',
+  "'@include' should tokenize as processingInstruction"
+);
+assert(
+  includeTokens[1]?.text === '"log_utils.awk"' && includeTokens[1]?.style === 'string',
+  'the quoted filename should be a single string token'
+);
+console.log('✅ String literals tokenize as single tokens!');
+
+// Test 5: The @include/@namespace quoted-argument lint check is not a false positive
+console.log('5. Verifying directive quoted-argument lint patterns...');
+const includeCheck = /@include\b(?!\s*["<])/;
+const namespaceCheck = /@namespace\b(?!\s*["<])/;
+assert(!includeCheck.test('@include "log_utils.awk"'), 'quoted @include should NOT warn');
+assert(!includeCheck.test('@include"log_utils.awk"'), 'quoted @include without space should NOT warn');
+assert(includeCheck.test('@include log_utils.awk'), 'unquoted @include should warn');
+assert(includeCheck.test('@include'), 'bare @include should warn');
+assert(!namespaceCheck.test('@namespace "analytics"'), 'quoted @namespace should NOT warn');
+assert(namespaceCheck.test('@namespace analytics'), 'unquoted @namespace should warn');
+console.log('✅ Directive lint patterns verified!');
+
+// Test 6: '#' inside a string or regexp literal does not start a comment
+console.log('6. Verifying comment detection respects strings and regexes...');
+assert(
+  findCommentStart('    print "Starting file #" ARGIND ":", FILENAME') === -1,
+  "'#' inside a string should not start a comment"
+);
+assert(findCommentStart('# full line comment') === 0, 'leading # should start a comment');
+assert(
+  findCommentStart('print "x" # trailing comment') === 10,
+  'trailing # after code should start a comment'
+);
+assert(
+  findCommentStart('sub(/#/, "-", $0) # strip hash') === 18,
+  "'#' inside a regexp should not start a comment"
+);
+assert(
+  findCommentStart('$6 ~ /"GET|"POST/ { print } # match') === 28,
+  'quotes inside a regexp should not break comment detection'
+);
+assert(
+  findCommentStart('x = a / b # not a regexp') === 10,
+  "division '/' should not hide a following comment"
+);
+assert(
+  findCommentStart('a = 0x0F  # 15') === 10,
+  "'#' after an expression should start a comment"
+);
+assert(
+  findCommentStart('print "unterminated # not a comment') === -1,
+  "'#' inside an unterminated string should not start a comment"
+);
+console.log('✅ Comment detection verified!');
 
 if (failures > 0) {
   console.error(`--- ${failures} Check(s) FAILED! ---`);

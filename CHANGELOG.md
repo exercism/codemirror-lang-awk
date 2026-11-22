@@ -17,6 +17,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   keyword list from the gawk manual.
 - The I/O statements `print`, `printf`, and `getline` now tokenize as keywords
   instead of plain variables.
+- Linter: `@include` and `@namespace` no longer falsely warn about a missing
+  quoted argument when the argument is properly quoted. The negative lookahead
+  in `/@include\s*(?!["<])/` was defeated by backtracking (`\s*` could match
+  zero characters, leaving the lookahead to inspect the space); the patterns
+  are now `/@include\b(?!\s*["<])/` and `/@namespace\b(?!\s*["<])/`.
+- Linter: a `#` inside a string or regexp literal no longer starts a comment.
+  Previously `print "Starting file #" ARGIND` was truncated at the `#` and
+  reported as an "Unterminated string literal", and `@directives` inside
+  genuine comments were flagged as unknown. Comment detection now uses the new
+  exported `findCommentStart()` helper, which tracks string and regexp state.
+- Tokenizer: a string literal is now emitted as a single `string` token
+  (previously the opening quote was a separate token from the rest of the
+  string).
+
+### Added
+
+- Add `npm run test:runner` script.
 
 ## [2.0.0] - 2026-11-21
 

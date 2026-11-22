@@ -55,8 +55,13 @@ export const awkStreamParser: StreamParser<AwkState> = {
       return 'comment';
     }
 
-    // 3. Handle string literals
-    if (state.inString) {
+    // 3. Handle string literals (opening quote through closing quote as one token)
+    if (state.inString || stream.peek() === '"') {
+      if (!state.inString) {
+        stream.next(); // consume the opening quote
+        state.inString = true;
+        state.stringQuote = '"';
+      }
       let escaped = false;
       while (!stream.eol()) {
         const ch = stream.next();
@@ -110,15 +115,7 @@ export const awkStreamParser: StreamParser<AwkState> = {
       return 'keyword';
     }
 
-    // 6. Handle string opening quote
-    if (stream.peek() === '"') {
-      stream.next();
-      state.inString = true;
-      state.stringQuote = '"';
-      return 'string';
-    }
-
-    // 7. Handle Regex start vs Division operator
+    // 6. Handle Regex start vs Division operator
     if (stream.peek() === '/') {
       if (state.expectRegex) {
         stream.next();
