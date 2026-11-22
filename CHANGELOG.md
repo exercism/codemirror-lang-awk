@@ -5,6 +5,36 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-11-22
+
+### Fixed
+
+- Function parameters and identifiers in function bodies were mislabeled as
+  `function(definition)` tokens: the tokenizer kept `lastToken = 'function'`
+  through the entire parameter list. Now only the identifier immediately
+  following `function`/`func` is treated as a definition.
+- Added missing gawk keywords `switch`, `case`, and `default`, completing the
+  keyword list from the gawk manual.
+- The I/O statements `print`, `printf`, and `getline` now tokenize as keywords
+  instead of plain variables.
+- Linter: `@include` and `@namespace` no longer falsely warn about a missing
+  quoted argument when the argument is properly quoted. The negative lookahead
+  in `/@include\s*(?!["<])/` was defeated by backtracking (`\s*` could match
+  zero characters, leaving the lookahead to inspect the space); the patterns
+  are now `/@include\b(?!\s*["<])/` and `/@namespace\b(?!\s*["<])/`.
+- Linter: a `#` inside a string or regexp literal no longer starts a comment.
+  Previously `print "Starting file #" ARGIND` was truncated at the `#` and
+  reported as an "Unterminated string literal", and `@directives` inside
+  genuine comments were flagged as unknown. Comment detection now uses the new
+  exported `findCommentStart()` helper, which tracks string and regexp state.
+- Tokenizer: a string literal is now emitted as a single `string` token
+  (previously the opening quote was a separate token from the rest of the
+  string).
+
+### Added
+
+- Add `npm run test:runner` script.
+
 ## [2.0.0] - 2026-11-21
 
 This project was renamed from "gawk" to "awk". The public API now uses `awk` naming
@@ -67,5 +97,6 @@ Initial release of the CodeMirror 6 language package for AWK and GNU AWK (gawk).
   `autocomplete` options.
 - Interactive demo (`npm run dev`).
 
+[2.0.1]: https://github.com/exercism/codemirror-lang-awk/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/exercism/codemirror-lang-awk/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/exercism/codemirror-lang-awk/releases/tag/v1.0.0

@@ -5,7 +5,7 @@ export default defineConfig({
   root: '.',
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
+      entry: resolve(import.meta.dirname, 'src/index.ts'),
       name: 'CodeMirrorLangGawk',
       fileName: (format) => `index.${format === 'es' ? 'js' : 'cjs'}`,
       formats: ['es', 'cjs']

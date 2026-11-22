@@ -3,6 +3,51 @@ import { Extension } from '@codemirror/state';
 import { GAWK_DIRECTIVES } from './tokens';
 
 /**
+ * Find the index of the first '#' that starts a comment, i.e. one that is not
+ * inside a string or regexp literal. Returns -1 if the line has no comment.
+ */
+export function findCommentStart(text: string): number {
+  let inStr = false;
+  let inRegex = false;
+  let inCharClass = false;
+
+  for (let c = 0; c < text.length; c++) {
+    const char = text[c];
+    const prevChar = c > 0 ? text[c - 1] : '';
+
+    if (inStr) {
+      if (char === '"' && prevChar !== '\\') {
+        inStr = false;
+      }
+    } else if (inRegex) {
+      if (char === '[' && prevChar !== '\\') {
+        inCharClass = true;
+      } else if (char === ']' && prevChar !== '\\') {
+        inCharClass = false;
+      } else if (char === '/' && prevChar !== '\\' && !inCharClass) {
+        inRegex = false;
+      }
+    } else if (char === '#') {
+      return c;
+    } else if (char === '"') {
+      inStr = true;
+    } else if (char === '/') {
+      // Heuristic: a '/' starts a regexp when it follows an operator, an
+      // opening delimiter, or a keyword that expects an expression.
+      const before = text.slice(0, c).trim();
+      if (
+        before === '' ||
+        /[=~,\(\!\?\:\{\;\+\-\*\%\&\|]$/.test(before) ||
+        /\b(print|printf|return|match|sub|gsub|gensub|patsplit|split|if|while)\s*$/i.test(before)
+      ) {
+        inRegex = true;
+      }
+    }
+  }
+  return -1;
+}
+
+/**
  * Diagnostic Linter for GNU AWK syntax checks
  */
 export function awkLinter(): Extension {
@@ -18,16 +63,16 @@ export function awkLinter(): Extension {
       const line = doc.line(i);
       const text = line.text;
 
-      // Skip comment lines
-      const commentIdx = text.indexOf('#');
+      // Strip trailing comment ('#' inside a string or regexp is not a comment)
+      const commentIdx = findCommentStart(text);
       const codeText = commentIdx !== -1 ? text.slice(0, commentIdx) : text;
 
       // 1. Check GNU Directives syntax
-      const directiveMatch = text.match(/@([a-zA-Z0-9_]+)/g);
+      const directiveMatch = codeText.match(/@([a-zA-Z0-9_]+)/g);
       if (directiveMatch) {
         for (const dirToken of directiveMatch) {
           if (!GAWK_DIRECTIVES.has(dirToken)) {
-            const pos = line.from + text.indexOf(dirToken);
+            const pos = line.from + codeText.indexOf(dirToken);
             diagnostics.push({
               from: pos,
               to: pos + dirToken.length,
@@ -39,7 +84,7 @@ export function awkLinter(): Extension {
       }
 
       // Check @include / @namespace missing quoted argument
-      if (/@include\s*(?!["<])/.test(codeText)) {
+      if (/@include\b(?!\s*["<])/.test(codeText)) {
         const pos = line.from + codeText.indexOf('@include');
         diagnostics.push({
           from: pos,
@@ -49,7 +94,7 @@ export function awkLinter(): Extension {
         });
       }
 
-      if (/@namespace\s*(?!["<])/.test(codeText)) {
+      if (/@namespace\b(?!\s*["<])/.test(codeText)) {
         const pos = line.from + codeText.indexOf('@namespace');
         diagnostics.push({
           from: pos,
