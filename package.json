@@ -1,6 +1,6 @@
 {
   "name": "@exercism/codemirror-lang-awk",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "CodeMirror 6 plugin and language support for GNU AWK",
   "author": {
     "name": "Glenn Jackman",

@@ -5,6 +5,19 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-11-22
+
+### Fixed
+
+- Function parameters and identifiers in function bodies were mislabeled as
+  `function(definition)` tokens: the tokenizer kept `lastToken = 'function'`
+  through the entire parameter list. Now only the identifier immediately
+  following `function`/`func` is treated as a definition.
+- Added missing gawk keywords `switch`, `case`, and `default`, completing the
+  keyword list from the gawk manual.
+- The I/O statements `print`, `printf`, and `getline` now tokenize as keywords
+  instead of plain variables.
+
 ## [2.0.0] - 2026-11-21
 
 This project was renamed from "gawk" to "awk". The public API now uses `awk` naming
@@ -67,5 +80,6 @@ Initial release of the CodeMirror 6 language package for AWK and GNU AWK (gawk).
   `autocomplete` options.
 - Interactive demo (`npm run dev`).
 
+[2.0.1]: https://github.com/exercism/codemirror-lang-awk/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/exercism/codemirror-lang-awk/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/exercism/codemirror-lang-awk/releases/tag/v1.0.0
