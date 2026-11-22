@@ -26,10 +26,17 @@ export const GAWK_KEYWORDS = new Set([
   'next',
   'nextfile',
   'exit',
+  'switch',
+  'case',
+  'default',
   'return',
   'delete',
   'function',
-  'func'
+  'func',
+  // Output/Input statements
+  'print',
+  'printf',
+  'getline'
 ]);
 
 /**

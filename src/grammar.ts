@@ -218,6 +218,7 @@ export const awkStreamParser: StreamParser<AwkState> = {
       // Check user function declaration / call context
       if (state.lastToken === 'function' || state.lastToken === 'func') {
         state.expectRegex = false;
+        state.lastToken = word;
         return 'function(definition)';
       }
 

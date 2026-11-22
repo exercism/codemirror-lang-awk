@@ -1,5 +1,13 @@
 import { EditorState } from '@codemirror/state';
-import { awkLanguage, awkLinter, GAWK_BUILTIN_FUNCTIONS, GAWK_DIRECTIVES } from '../src/index';
+import { StringStream } from '@codemirror/language';
+import {
+  awkLanguage,
+  awkLinter,
+  awkStreamParser,
+  GAWK_BUILTIN_FUNCTIONS,
+  GAWK_DIRECTIVES,
+  GAWK_KEYWORDS
+} from '../src/index';
 
 console.log('--- Testing GNU AWK CodeMirror 6 Plugin ---');
 
@@ -13,6 +21,46 @@ console.assert(GAWK_BUILTIN_FUNCTIONS['patsplit'], 'Built-ins should contain pat
 console.assert(GAWK_BUILTIN_FUNCTIONS['strftime'], 'Built-ins should contain strftime');
 console.log('✅ Tokens & Built-ins verified!');
 
+// Test 1b: Statements tokenize as keywords, not variables
+console.log('1b. Verifying print/printf/getline tokenize as keywords...');
+console.assert(GAWK_KEYWORDS.has('print'), 'Keywords should contain print');
+console.assert(GAWK_KEYWORDS.has('printf'), 'Keywords should contain printf');
+console.assert(GAWK_KEYWORDS.has('getline'), 'Keywords should contain getline');
+
+function firstToken(code: string): string | null {
+  const state = awkStreamParser.startState();
+  const stream = new StringStream(code, 4, 4);
+  return awkStreamParser.token(stream, state);
+}
+
+console.assert(firstToken('print "hello"') === 'keyword', "'print' should tokenize as keyword");
+console.assert(firstToken('printf "%d\\n", n') === 'keyword', "'printf' should tokenize as keyword");
+console.assert(firstToken('getline line < file') === 'keyword', "'getline' should tokenize as keyword");
+console.assert(firstToken('printout = 1') === 'variableName', "'printout' should still be a variable");
+console.log('✅ Statements tokenize as keywords!');
+
+// Test 1c: All keywords from the gawk manual are recognized
+console.log('1c. Verifying all gawk manual keywords are covered...');
+const GAWK_MANUAL_KEYWORDS = [
+  'break', 'case', 'continue', 'default', 'delete', 'do', 'else',
+  'exit', 'for', 'function', 'func', 'if', 'in', 'next', 'nextfile',
+  'switch', 'while'
+];
+for (const kw of GAWK_MANUAL_KEYWORDS) {
+  console.assert(GAWK_KEYWORDS.has(kw), `Keywords should contain ${kw}`);
+}
+for (const pattern of ['BEGIN', 'BEGINFILE', 'END', 'ENDFILE']) {
+  console.assert(
+    firstToken(pattern + ' { print }') === 'special(keyword)',
+    `'${pattern}' should tokenize as special(keyword)`
+  );
+}
+console.assert(
+  firstToken('switch (x) { case 1: print x; default: print "?" }') === 'keyword',
+  "'switch' should tokenize as keyword"
+);
+console.log('✅ All gawk manual keywords covered!');
+
 // Test 2: Language Instantiation
 console.log('2. Verifying EditorState initialization...');
 const state = EditorState.create({
@@ -22,5 +70,42 @@ const state = EditorState.create({
 
 console.assert(state.doc.toString().includes('BEGIN'), 'Doc should contain BEGIN');
 console.log('✅ EditorState initialized successfully!');
+
+// Test 3: Function parameters tokenize as variables, not function definitions
+console.log('3. Verifying function parameters are not mislabeled as definitions...');
+
+function tokenizeLines(lines: string[]): Map<string, string | null> {
+  const parserState = awkStreamParser.startState();
+  const tokens = new Map<string, string | null>();
+  for (const line of lines) {
+    const stream = new StringStream(line, 4, 4);
+    while (!stream.eol()) {
+      const pos = stream.pos;
+      const style = awkStreamParser.token(stream, parserState);
+      if (stream.pos === pos) stream.next(); // safety: always advance
+      if (style) tokens.set(stream.current(), style);
+      stream.start = stream.pos; // normally done by the editor between tokens
+    }
+  }
+  return tokens;
+}
+
+const funcTokens = tokenizeLines([
+  'function nextPrime(prime,    candidate) {',
+  '    candidate = prime + 2'
+]);
+console.assert(
+  funcTokens.get('nextPrime') === 'function(definition)',
+  "'nextPrime' should tokenize as function(definition)"
+);
+console.assert(
+  funcTokens.get('prime') === 'variableName',
+  "parameter 'prime' should tokenize as variableName"
+);
+console.assert(
+  funcTokens.get('candidate') === 'variableName',
+  "parameter 'candidate' should tokenize as variableName"
+);
+console.log('✅ Function parameters tokenize as variables!');
 
 console.log('--- All Plugin Checks Passed! ---');
